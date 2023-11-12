@@ -75,10 +75,12 @@ bool isDelimiter(const std::string& token) {
 }
 
 bool isPreprocessorDirective(const std::string& token) {
-    //std::regex preprocessor_regex("#[a-z]+");
-    std::regex preprocessor_regex("#[^\n]*");
+    std::vector<std::string> preprocessorKeywords = {
+            "#if", "#elif", "#else", "#endif", "#define", "#undef", "#warning", "#error",
+            "#line", "#region", "#endregion", "#pragma"
+    };
 
-    return std::regex_match(token, preprocessor_regex);
+    return std::find(preprocessorKeywords.begin(), preprocessorKeywords.end(), token) != preprocessorKeywords.end();
 }
 
 std::vector<Token> tokenize(const std::string& code) {
@@ -144,7 +146,7 @@ std::vector<Token> tokenize(const std::string& code) {
                 token.clear();
             }
         }
-        else if (std::ispunct(c) && c != '.') {
+        else if (std::ispunct(c) && c != '.' && c != '#') {
             if (!token.empty()) {
                 tokens.push_back({token, Unknown });
                 token.clear();
@@ -162,18 +164,19 @@ std::vector<Token> tokenize(const std::string& code) {
 
     for (Token &t: tokens) {
         if (isKeyword(t.value)) t.type = Keyword;
+        else if (isPreprocessorDirective(t.value)) t.type = PreprocessorDirective;
         else if (isIdentifier(t.value)) t.type = Identifier;
         else if (isHexadecimalNumber(t.value)) t.type = HexadecimalNumber;
         else if (isDecimalNumber(t.value)) t.type = DecimalNumber;
         else if (isNumericConstant(t.value)) t.type = Number;
         else if (isOperator(t.value)) t.type = Operator;
         else if (isDelimiter(t.value)) t.type = Punctuation;
-        else if (isPreprocessorDirective(t.value)) t.type = PreprocessorDirective;
         else if (isStringConstant(t.value)) t.type = String;
     }
 
     return tokens;
 }
+
 
 
 void displayTokens(const std::vector<Token>& tokens) {
@@ -197,7 +200,7 @@ void displayTokens(const std::vector<Token>& tokens) {
 }
 
 int main() {
-    std::ifstream inputFile("..//test.txt");
+    std::ifstream inputFile("..//test.cs");
 
     if (!inputFile.is_open())
     {

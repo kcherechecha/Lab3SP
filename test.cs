@@ -1,14 +1,13 @@
+@
 using System;
             class Program {
             // Single line comment
                 static void Main(string[] args) {
-                    Console.WriteLine("Hello, world!");
-
                     int hexNumber = 0x1a3;
                     int number = 10;
                     int numberNext = 5;
-                    if (number < numberNext){
-                    Console.WriteLine(number);
+                    #if (number < numberNext){
+                    int dec = 10.5;
                     }
                     }
                     /*
@@ -16,3 +15,5 @@ using System;
                     */
                 }
             }
+            §
+
